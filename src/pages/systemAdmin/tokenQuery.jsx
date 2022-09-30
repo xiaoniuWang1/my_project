@@ -17,7 +17,6 @@ function tokenQuery() {
         if (e.target.value != '') {
             var token = e.target.value
             var decoded = JSON.stringify(jwt_decode(token), null, 4);
-            console.log(decoded);
             setTokenInp(decoded); 
         }
     }
