@@ -13,7 +13,6 @@ function tokenQuery() {
     }, []);
 
     const onChange = (e) => {
-        console.log(e.target.value);
         if (e.target.value != '') {
             var token = e.target.value
             var decoded = JSON.stringify(jwt_decode(token), null, 4);
