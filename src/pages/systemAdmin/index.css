@@ -1,0 +1,32 @@
+.user-box{
+    border-bottom: 1px solid gray;
+    height: 47%;
+    font-size: 15px;
+    /* font-weight: 800; */
+    padding:10px 30px;
+}
+.user-box .user-title{
+    margin:0px auto;
+    width: 100px;
+}
+.user-box div{
+    margin-bottom:6px;
+}
+.user-box span{
+    font-size: 14px;
+}
+.user-box #btn{
+    float: right;
+}
+.ant-upload-list-text-container{
+    width:500px
+}
+.filesUploadBox{
+    /* background-color: white; */
+    height: 100%;
+}
+.filesUpload-box{
+    background-color: white;
+    margin-bottom: 15px;
+    padding: 30px;
+}
