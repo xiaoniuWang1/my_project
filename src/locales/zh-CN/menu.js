@@ -61,4 +61,7 @@ export default {
   "menu.systemAdmin.runMonitoring": '运行监控',
   "menu.systemAdmin.filesUpload": '文件上传',
   "menu.systemAdmin.tokenQuery": 'token查询',
+  "menu.systemAdmin.jobManage": '职务管理',
+  "menu.systemAdmin.stationManage": '岗位管理',
+  "menu.systemAdmin.userManage": '用户管理',
 };

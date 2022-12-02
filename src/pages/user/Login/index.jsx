@@ -19,6 +19,7 @@ import { Alert, message, Tabs } from 'antd';
 import { useState } from 'react';
 import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
 import styles from './index.less';
+import request from 'umi-request'; //导入接口
 
 const LoginMessage = ({ content }) => (
   <Alert
@@ -46,36 +47,50 @@ const Login = () => {
   };
 
   const handleSubmit = async (values) => {
-    try {
-      // 登录
-      const msg = await login({ ...values, type });
+    // 清楚之前的token
+    sessionStorage.removeItem('cm-authenticationToken');
+    sessionStorage.removeItem('cm-authenticationRefreshToken');
 
-      if (msg.status === 'ok') {
-        const defaultLoginSuccessMessage = intl.formatMessage({
-          id: 'pages.login.success',
-          defaultMessage: '登录成功！',
-        });
-        message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
+    // 传参
+    const params = {
+      'grant_type': 'password',
+      'username': values.username,
+      'password': values.password
+    }
+    // 请求头
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": "Basic d2ViLWNsaWVudDpzZWNyZXQ="
+    }
+    request('/oauth/token', {
+      headers: headers,
+      method: 'POST',
+      params: params,
+    }).then(async (res) => {
+      // 保存token做判断
+      let token = res?.access_token;
+      let refreshToken = res?.refresh_token;
+      // 如果有token 保存到会话存储
+      if (token) {
+        sessionStorage.setItem('cm-authenticationToken', res.access_token);
+      }
+      if (refreshToken) {
+        sessionStorage.setItem('cm-authenticationRefreshToken', res.refresh_token);
+      }
+      // 如果token不为空 登录成功 跳转首页
+      if (token !== null) {
+        message.success('登录成功');
+        // 获取用户信息
+        await fetchUserInfo()
         /** 此方法会跳转到 redirect 参数所在的位置 */
-
         if (!history) return;
-        const { query } = history.location;
-        const { redirect } = query;
-        history.push(redirect || '/');
+        history.push('/');
         return;
       }
-
-      console.log(msg); // 如果失败去设置用户错误信息
-
-      setUserLoginState(msg);
-    } catch (error) {
-      const defaultLoginFailureMessage = intl.formatMessage({
-        id: 'pages.login.failure',
-        defaultMessage: '登录失败，请重试！',
-      });
-      message.error(defaultLoginFailureMessage);
-    }
+    }).catch((error) => {
+      console.log(error);
+      message.error('密码错误')
+    })
   };
 
   const { status, type: loginType } = userLoginState;
@@ -96,7 +111,7 @@ const Login = () => {
             await handleSubmit(values);
           }}
         >
-          <div style={{margin:'10px 0px 50px 0px'}}></div>
+          <div style={{ margin: '10px 0px 50px 0px' }}></div>
           {status === 'error' && loginType === 'account' && (
             <LoginMessage
               content={intl.formatMessage({
