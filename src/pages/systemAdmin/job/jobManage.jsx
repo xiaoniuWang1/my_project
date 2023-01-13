@@ -1,3 +1,6 @@
+
+// 系统管理 职务管理
+
 import React, { useState, useRef } from 'react';
 import { Button, Input, Space, Table, Modal, Form, message } from 'antd';
 import { SearchOutlined, RedoOutlined, PlusOutlined, DeleteOutlined, DownloadOutlined, UserSwitchOutlined } from '@ant-design/icons';
@@ -16,10 +19,10 @@ const data = [
         sort: '13',
     },
     {
-        id:1314,
-        name:'岳不群',
-        coding:'12333',
-        sort:'15'
+        id: 1314,
+        name: '岳不群',
+        coding: '12333',
+        sort: '15'
     }
 ];
 
@@ -42,22 +45,27 @@ function jobManage(props) {
         {
             title: '序号',
             dataIndex: 'id',
+            align: 'center'
         },
         {
             title: '职务名称',
             dataIndex: 'name',
+            align: 'center'
         },
         {
             title: '职务编码',
             dataIndex: 'coding',
+            align: 'center'
         },
         {
             title: '排序',
             dataIndex: 'sort',
+            align: 'center'
         },
         {
             title: '操作',
             key: 'action',
+            align: 'center',
             render: (_, record) => (
                 <Space size="middle">
                     <a>用户</a>
@@ -258,7 +266,7 @@ function jobManage(props) {
             </div>
 
             <div>
-                <Table rowKey={record => { return record.id }} rowSelection={{ ...rowSelection }} columns={columns} dataSource={data} />
+                <Table bordered rowKey={record => { return record.id }} rowSelection={{ ...rowSelection }} columns={columns} dataSource={data} />
             </div>
 
         </div>

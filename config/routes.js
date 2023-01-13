@@ -72,6 +72,11 @@ export default [
       //   component: './systemAdmin/tokenQuery',
       // },
       {
+        name: 'organizationManage',
+        path: '/systemAdmin/organization/organizationManage',
+        component: './systemAdmin/organization/organizationManage',
+      },
+      {
         name: 'jobManage',
         path: '/systemAdmin/job/jobManage',
         component: './systemAdmin/job/jobManage',

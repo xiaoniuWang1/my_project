@@ -1,3 +1,6 @@
+
+// 系统管理 岗位管理
+
 import React, { useState } from 'react';
 import { Button, Input, Space, Table } from 'antd';
 import { SearchOutlined, RedoOutlined, PlusOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
@@ -42,7 +45,7 @@ for (let i = 0; i < 46; i++) {
 
 function stationManage(props) {
 
-    const [data, setData] = useState([]);
+    // const [data, setData] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     const onSelectChange = (newSelectedRowKeys) => {
