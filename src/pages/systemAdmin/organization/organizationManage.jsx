@@ -138,7 +138,7 @@ function organizationManage(props) {
 
     // 点击删除
     const del = (record) => {
-        console.log('删除');
+        console.log('删除删除');
     }
 
     return (
