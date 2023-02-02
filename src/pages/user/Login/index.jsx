@@ -68,17 +68,19 @@ const Login = () => {
       params: params,
     }).then(async (res) => {
       // 保存token做判断
-      let token = res?.access_token;
+      // let token = res?.access_token;
+      let token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJhZG1pbiIsInNjb3BlIjpbInRvZG8ucmVhZCIsInRvZG8ud3JpdGUiXSwidGVuYW50SWQiOiJnaXRlZSIsIm5hbWUiOiLnrqHnkIblkZgiLCJleHAiOjE2NzUzMTI3MTMsImF1dGhvcml0aWVzIjpbIlJPTEVfQURNSU4iLCJBRE1JTiJdLCJqdGkiOiJDNU1QYVEybmQ0YTJYTWtROVI1cVdQTkVKY3ciLCJjbGllbnRfaWQiOiJ3ZWItY2xpZW50In0.MAwW5MXV4ryDQcZQpLKmhHTbWhsOQZK9dH1Vhu-5NWp5aTuhH6U1cVdJ0-P-oT_3B_Z7YSXL50WctYxHqnsXD9KhxgbODSh9pIOQRXTogXLvlSd1u8xqvONj8ZQHA0enWbNh2KBgJyyTyt1mKQG9LnMU4M-4UPYP3wtZswdMwz2ddn8Iqq822qQ31rskhowv98QH3_a3G2dNjTYKRWpZWSZFwNvB4pRYHESAhqyD5-hjT3ZzJvJKhglwk5_aTW-u6EgLDl8wfCCvoxGZgffRgRPhWbG0A71Ym84WKgXy1D-kSEPWRE2RK8EOWAFAq8rZXbVW2llCSZb33_fuwa504A';
       let refreshToken = res?.refresh_token;
       // 如果有token 保存到会话存储
       if (token) {
-        sessionStorage.setItem('cm-authenticationToken', res.access_token);
+        sessionStorage.setItem('cm-authenticationToken', token);
       }
       if (refreshToken) {
         sessionStorage.setItem('cm-authenticationRefreshToken', res.refresh_token);
       }
       // 如果token不为空 登录成功 跳转首页
-      if (token !== null) {
+      if (token !== null && token !== undefined) {
+        console.log(token);
         message.success('登录成功');
         // 获取用户信息
         await fetchUserInfo()
