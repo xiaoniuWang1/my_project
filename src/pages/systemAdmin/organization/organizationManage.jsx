@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Table } from 'antd';
+import { Button, Input, Space, Table, message } from 'antd';
 import { SearchOutlined, RedoOutlined, PlusOutlined, DownloadOutlined, ImportOutlined } from '@ant-design/icons';
 import BaseModal from './components/Modal/modal';
 import api from '@/util/api';
@@ -86,22 +86,22 @@ function organizationManage(props) {
     const [data, setData] = useState([]);
     const columns = [
         {
-            title: '组织名称',
+            title: '部门名称',
             dataIndex: 'orgName',
             align: 'center'
         },
         {
-            title: '组织编码',
+            title: '部门编码',
             dataIndex: 'orgCode',
             align: 'center'
         },
         {
-            title: '组织类型',
+            title: '部门类型',
             dataIndex: 'orgType',
             align: 'center'
         },
         {
-            title: '组织排序',
+            title: '部门排序',
             dataIndex: 'sort',
             align: 'center'
         },
@@ -119,11 +119,15 @@ function organizationManage(props) {
         },
     ];
 
-    useEffect(() => {
+    // 初始化部门数据
+    const initData = () => {
         api.getOrganizationsParentId().then((res) => {
-            console.log(res);
-            setData(res)
+            setData(res);
         });
+    }
+
+    useEffect(() => {
+        initData()
     }, [])
 
     // 显示新增Modal
@@ -146,9 +150,31 @@ function organizationManage(props) {
         setRecord(record);
     };
 
+    // 子组件编辑信息接口函数
+    const amendOrg = (id, params) => {
+        api.patchAmendOrganizations(id, params).then((res) => {
+            message.success('修改成功')
+            setOpen(false)
+            initData()
+        })
+    }
+
+    // 添加部门
+    const addOrg = (params) => {
+        api.addOrganization(params).then((res) => {
+            message.success('添加成功');
+            setOpen(false)
+            initData()
+        })
+    }
+
     // 点击删除
     const del = (record) => {
         console.log('删除');
+        api.deleteOrganizations(record.id).then((res) => {
+            message.success('删除成功')
+            initData()
+        })
     }
 
     return (
@@ -174,7 +200,7 @@ function organizationManage(props) {
                     dataSource={data}
                 />
             </div>
-            <BaseModal vis={open} fn={showModal} title={modalTitle} record={record}></BaseModal>
+            <BaseModal vis={open} fn={showModal} onAmend={amendOrg} onAdd={addOrg} title={modalTitle} record={record}></BaseModal>
         </div>
     );
 }

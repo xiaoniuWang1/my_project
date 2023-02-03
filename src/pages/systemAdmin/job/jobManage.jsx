@@ -1,9 +1,10 @@
 
 // 系统管理 职务管理
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, Input, Space, Table, Modal, Form, message } from 'antd';
 import { SearchOutlined, RedoOutlined, PlusOutlined, DeleteOutlined, DownloadOutlined, UserSwitchOutlined } from '@ant-design/icons';
+import api from '@/util/api';
 
 const data = [
     {
@@ -28,7 +29,7 @@ const data = [
 
 function jobManage(props) {
 
-    // const [data, setData] = useState([]);
+    const [data, setData] = useState([]);
     const [open, setOpen] = useState(false);//新增的显示隐藏
     const [confirmLoading, setConfirmLoading] = useState(false);//新增确定时loding动画
     const [modalTitle, setModalTitle] = useState('');//显示modal title名称
@@ -37,6 +38,7 @@ function jobManage(props) {
     const [redact_coding, setRedact_coding] = useState('');
     const [redact_sort, setRedact_sort] = useState('');
     const [redact_describe, setRedact_describe] = useState('');
+    const [id, setId] = useState();
 
     const formRef = useRef(null);
     const inpRef = useRef(null);
@@ -49,12 +51,12 @@ function jobManage(props) {
         },
         {
             title: '职务名称',
-            dataIndex: 'name',
+            dataIndex: 'positionName',
             align: 'center'
         },
         {
             title: '职务编码',
-            dataIndex: 'coding',
+            dataIndex: 'positionCode',
             align: 'center'
         },
         {
@@ -76,6 +78,16 @@ function jobManage(props) {
         },
     ];
 
+    const initData = () => {
+        api.getSysPositions().then((res) => {
+            setData(res)
+        })
+    }
+
+    useEffect(() => {
+        initData();
+    }, [])
+
     // 点击查询
     const searchInp = () => {
         inpRef.current.validateFields().then((value) => {
@@ -93,15 +105,21 @@ function jobManage(props) {
         console.log(record);
         setOpen(true);
         setModalTitle('编辑');
-        setRedact_name(record.name)
-        setRedact_coding(record.coding)
-        setRedact_sort(record.sort)
-        setRedact_describe(record.name)
+        setRedact_name(record.positionName);
+        setRedact_coding(record.positionCode);
+        setRedact_sort(record.sort);
+        setRedact_describe(record.description);
+        setId(record.id);
     };
 
     // 点击删除
     const del = (record) => {
-        console.log('删除', record);
+        api.deleteSysPositions(record.id).then((res) => {
+            message.success('删除成功');
+            initData();
+        }).catch((res) => {
+            message.error('删除失败');
+        });
     }
 
     // 表格多选框
@@ -129,18 +147,32 @@ function jobManage(props) {
 
     // 新增Modal确定
     const handleOk = () => {
-        setConfirmLoading(true);
-        setTimeout(() => {
-            console.log(formRef);
-            formRef.current.validateFields().then(values => {
-                console.log(values);
-                setOpen(false);
-                setConfirmLoading(false);
-            }).catch(reason => {
-                message.warning('表单输入不允许为空，请检查');
-                setConfirmLoading(false);
-            })
-        }, 2000);
+        formRef.current.validateFields().then(values => {
+            let params = values;
+            if (modalTitle === '编辑') {
+                params.id = id;
+                api.patchAmendSysPosition(id, params).then((res) => {
+                    setOpen(false);
+                    message.success('修改成功');
+                    initData();
+                }).catch((res) => {
+                    message.error('修改失败');
+                    setOpen(false);
+                });
+            }
+            if (modalTitle === '新增') {
+                api.postAddSysPositions(params).then((res) => {
+                    setOpen(false);
+                    message.success('添加成功');
+                    initData();
+                }).catch((res) => {
+                    message.error('新增失败');
+                    setOpen(false);
+                });
+            }
+        }).catch(reason => {
+            message.warning('表单输入不允许为空，请检查');
+        })
     };
 
     // 关闭新增Modal
@@ -169,14 +201,14 @@ function jobManage(props) {
                 >
                     <Form.Item
                         label="职务名称"
-                        name="name"
+                        name="positionName"
                     >
                         <Input />
                     </Form.Item>
 
                     <Form.Item
                         label="职务编码"
-                        name="coding"
+                        name="positionCode"
                         style={{ marginRight: 10 }}
                     >
                         <Input />
@@ -198,7 +230,6 @@ function jobManage(props) {
                         open={open}
                         onOk={handleOk}
                         onCancel={handleCancel}
-                        confirmLoading={confirmLoading}
                         destroyOnClose={true}
                     >
                         <Form
@@ -217,7 +248,7 @@ function jobManage(props) {
                         >
                             <Form.Item
                                 label="职务名称"
-                                name="name"
+                                name="positionName"
                                 rules={[
                                     {
                                         required: true,
@@ -232,7 +263,7 @@ function jobManage(props) {
 
                             <Form.Item
                                 label="职务编码"
-                                name="coding"
+                                name="positionCode"
                                 rules={[
                                     {
                                         required: true,
@@ -253,7 +284,7 @@ function jobManage(props) {
                             </Form.Item>
                             <Form.Item
                                 label="描述"
-                                name="describe"
+                                name="description"
                                 initialValue={redact_describe}
                             >
                                 <Input />
