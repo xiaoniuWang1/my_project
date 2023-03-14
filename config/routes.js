@@ -41,36 +41,6 @@ export default [
     icon: 'SettingOutlined',
     path: '/systemAdmin',
     routes: [
-      // {
-      //   name: 'role-admin',
-      //   path: '/systemAdmin/role-admin',
-      //   component: './systemAdmin/role-admin',
-      // },
-      // {
-      //   name: 'user-admin',
-      //   path: '/systemAdmin/user-admin',
-      //   component: './systemAdmin/user-admin',
-      // },
-      // {
-      //   name: 'object-admin',
-      //   path: '/systemAdmin/object-admin',
-      //   component: './systemAdmin/object-admin',
-      // },
-      // {
-      //   name: 'bm-admin',
-      //   path: '/systemAdmin/bm-admin',
-      //   component: './systemAdmin/bm-admin',
-      // },
-      // {
-      //   name: 'filesUpload',
-      //   path: '/systemAdmin/filesUpload',
-      //   component: './systemAdmin/filesUpload',
-      // },
-      // {
-      //   name: 'tokenQuery',
-      //   path: '/systemAdmin/tokenQuery',
-      //   component: './systemAdmin/tokenQuery',
-      // },
       {
         name: 'organizationManage',
         path: '/systemAdmin/organization/organizationManage',
@@ -90,6 +60,28 @@ export default [
         name: 'userManage',
         path: '/systemAdmin/user/userManage',
         component: './systemAdmin/user/userManage',
+      },
+    ]
+  },
+  {
+    name: 'menuPower',
+    icon: 'SettingOutlined',
+    path: '/menuPower',
+    routes: [
+      {
+        name: 'roleManage',
+        path: '/menuPower/role/roleManage',
+        component: './menuPower/role/roleManage'
+      },
+      {
+        name: 'menuManage',
+        path: '/menuPower/menu/menuManage',
+        component: './menuPower/menu/menuManage'
+      },
+      {
+        name: 'permissionsManage',
+        path: '/menuPower/permissions/permissionsManage',
+        component: './menuPower/permissions/permissionsManage'
       },
     ]
   },

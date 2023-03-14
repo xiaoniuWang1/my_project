@@ -1,83 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Button, Input, Space, Table, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, Input, Space, Table, message, Popconfirm } from 'antd';
 import { SearchOutlined, RedoOutlined, PlusOutlined, DownloadOutlined, ImportOutlined } from '@ant-design/icons';
 import BaseModal from './components/Modal/modal';
 import api from '@/util/api';
-import request from "umi-request";
-
-const data = [
-    {
-        key: 1,
-        name: 'John Brown sr.',
-        age: 60,
-        address: '部门',
-        sort: 30,
-        children: [
-            {
-                key: 11,
-                name: 'John Brown',
-                age: 42,
-                sort: 30,
-                address: '部门',
-            },
-            {
-                key: 12,
-                name: 'John Brown jr.',
-                age: 30,
-                sort: 30,
-                address: '组织',
-                children: [
-                    {
-                        key: 121,
-                        name: 'Jimmy Brown',
-                        age: 16,
-                        sort: 30,
-                        address: '部门',
-                    },
-                ],
-            },
-            {
-                key: 13,
-                name: 'Jim Green sr.',
-                age: 72,
-                sort: 30,
-                address: '组织',
-                children: [
-                    {
-                        key: 131,
-                        name: 'Jim Green',
-                        age: 42,
-                        sort: 30,
-                        address: '部门',
-                        children: [
-                            {
-                                key: 1311,
-                                name: 'Jim Green jr.',
-                                age: 25,
-                                sort: 30,
-                                address: '组织',
-                            },
-                            {
-                                key: 1312,
-                                name: '组织',
-                                age: 18,
-                                sort: 30,
-                                address: '部门',
-                            },
-                        ],
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        key: 2,
-        name: 'Joe Black',
-        age: 32,
-        sort: 30,
-        address: '组织',
-    },
-];
 
 function organizationManage(props) {
     const [open, setOpen] = useState(false);//新增的显示隐藏
@@ -113,7 +38,15 @@ function organizationManage(props) {
                 <Space size="middle">
                     <a onClick={() => { addSubordinate(record) }}>新增下级</a>
                     <a onClick={() => { redact(record) }}>编辑</a>
-                    <a onClick={() => { del(record) }}>删除</a>
+                    <Popconfirm
+                        title="确定删除该记录吗？"
+                        description="Are you sure to delete this task?"
+                        onConfirm={() => { del(record) }}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <a href="#">删除</a>
+                    </Popconfirm>
                 </Space>
             ),
         },
@@ -165,6 +98,9 @@ function organizationManage(props) {
             message.success('添加成功');
             setOpen(false)
             initData()
+        }).catch((res) => {
+            message.error('添加失败');
+            setOpen(false);
         })
     }
 
@@ -198,6 +134,7 @@ function organizationManage(props) {
                     columns={columns}
                     bordered
                     dataSource={data}
+                    rowKey={(record) => record.id}
                 />
             </div>
             <BaseModal vis={open} fn={showModal} onAmend={amendOrg} onAdd={addOrg} title={modalTitle} record={record}></BaseModal>

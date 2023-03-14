@@ -79,7 +79,6 @@ const Login = () => {
       }
       // 如果token不为空 登录成功 跳转首页
       if (token !== null && token !== undefined) {
-        console.log(token);
         message.success('登录成功');
         // 获取用户信息
         await fetchUserInfo()
@@ -89,7 +88,6 @@ const Login = () => {
         return;
       }
     }).catch((error) => {
-      console.log(error);
       message.error('密码错误')
     })
   };

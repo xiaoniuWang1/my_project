@@ -25,11 +25,11 @@ export default {
       changeOrigin: true,
     },
     '/oauth': {
-      // 要代理的地址
-      // http://172.16.5.158:7601/api/admin/organizations-parentId/392
       target: 'http://172.16.5.158:7869/',
-      // 配置了这个可以从 http 代理到 https
-      // 依赖 origin 的功能可能需要这个，比如 cookie
+      changeOrigin: true,
+    },
+    '/admin': {
+      target: 'http://172.16.5.158:7869/',
       changeOrigin: true,
     },
   },

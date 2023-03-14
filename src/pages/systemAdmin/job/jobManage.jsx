@@ -2,36 +2,14 @@
 // 系统管理 职务管理
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Input, Space, Table, Modal, Form, message } from 'antd';
-import { SearchOutlined, RedoOutlined, PlusOutlined, DeleteOutlined, DownloadOutlined, UserSwitchOutlined } from '@ant-design/icons';
+import { Button, Input, Space, Table, Modal, Form, message, Popconfirm } from 'antd';
+import { SearchOutlined, RedoOutlined, PlusOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 import api from '@/util/api';
-
-const data = [
-    {
-        id: 1,
-        name: '123',
-        coding: '321',
-        sort: '1',
-    },
-    {
-        id: 12,
-        name: '1232',
-        coding: '3213',
-        sort: '13',
-    },
-    {
-        id: 1314,
-        name: '岳不群',
-        coding: '12333',
-        sort: '15'
-    }
-];
 
 function jobManage(props) {
 
     const [data, setData] = useState([]);
     const [open, setOpen] = useState(false);//新增的显示隐藏
-    const [confirmLoading, setConfirmLoading] = useState(false);//新增确定时loding动画
     const [modalTitle, setModalTitle] = useState('');//显示modal title名称
 
     const [redact_name, setRedact_name] = useState('');
@@ -46,8 +24,10 @@ function jobManage(props) {
     const columns = [
         {
             title: '序号',
-            dataIndex: 'id',
-            align: 'center'
+            align: 'center',
+            render: (text, record, index) => {
+                return index + 1
+            }
         },
         {
             title: '职务名称',
@@ -72,7 +52,15 @@ function jobManage(props) {
                 <Space size="middle">
                     <a>用户</a>
                     <a onClick={() => { redact(record) }}>编辑</a>
-                    <a onClick={() => { del(record) }}>删除</a>
+                    <Popconfirm
+                        title="确定删除该记录吗？"
+                        description="Are you sure to delete this task?"
+                        onConfirm={() => { del(record) }}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <a href="#">删除</a>
+                    </Popconfirm>
                 </Space>
             ),
         },

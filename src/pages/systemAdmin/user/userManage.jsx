@@ -1,10 +1,12 @@
 
 // 系统管理 用户管理
 
-import React, { useRef, useState } from 'react';
-import { DownOutlined, CarryOutOutlined, CheckOutlined, FormOutlined, SearchOutlined, RedoOutlined, PlusOutlined, DeleteOutlined, DownloadOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
-import { Input, Tree, Form, Button, Space, Modal, Table, Menu, Dropdown, Badge } from 'antd';
-import BaseModal from './components/Modal/modal'
+import React, { useRef, useState, useEffect } from 'react';
+import { DownOutlined, CarryOutOutlined, FormOutlined, SearchOutlined, RedoOutlined, PlusOutlined, DeleteOutlined, DownloadOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import { Input, Tree, Form, Button, Space, Table, Menu, Dropdown, Badge, message, Popconfirm } from 'antd';
+import BaseModal from './components/Modal/modal';
+import api from '@/util/api'
+import { login } from '@/services/ant-design-pro/api';
 
 const data = [
     {
@@ -127,8 +129,37 @@ function userManage(props) {
     const [open, setOpen] = useState(false);//新增的显示隐藏
     const [modalTitle, setModalTitle] = useState('');//显示modal title名称
     const [record, setRecord] = useState({});
+    const [data, setData] = useState([]);
+    const [treeData, setTreeData] = useState([]);
+    const [orgId, setOrgId] = useState()
 
     const inpRef = useRef(null);
+
+    const initData = () => {
+        api.getUserBasics().then((res) => {
+            setData(res);
+        });
+        api.getOrganizationsParentId().then((res) => {
+            res.map((item) => {
+                item.title = item.orgName
+                if (item.children.length > 0) {
+                    item.children.map((i) => {
+                        i.title = i.orgName
+                        if (i.children.length > 0) {
+                            i.children.map((i) => {
+                                i.title = i.orgName
+                            })
+                        }
+                    })
+                }
+            });
+            setTreeData(res);
+        });
+    };
+
+    useEffect(() => {
+        initData()
+    }, [])
 
     // 表格
     const columns = [
@@ -144,7 +175,7 @@ function userManage(props) {
         },
         {
             title: '性别',
-            dataIndex: 'sex',
+            dataIndex: 'sexDictText',
             align: 'center'
         },
         {
@@ -159,12 +190,12 @@ function userManage(props) {
         },
         {
             title: '工号',
-            dataIndex: 'jobNumber',
+            dataIndex: 'workNo',
             align: 'center'
         },
         {
             title: '状态',
-            dataIndex: 'status',
+            dataIndex: 'statusDictText',
             align: 'center',
             render: (text, record, index) => (
                 <span>
@@ -179,7 +210,9 @@ function userManage(props) {
             render: (_, record) => (
                 <Space size="middle">
                     <a onClick={() => { redact(record) }}>编辑</a>
-                    <Dropdown overlay={menu}>
+                    <Dropdown
+                        overlay={menu(record)}
+                    >
                         <a>
                             更多 <DownOutlined />
                         </a>
@@ -192,7 +225,7 @@ function userManage(props) {
     // 下拉列表操作项
     const menu = (record) => {
         return (
-            <Menu onClick={del} record={record}>
+            <Menu>
                 <Menu.Item key='details'>
                     <span>详情</span>
                 </Menu.Item>
@@ -200,7 +233,16 @@ function userManage(props) {
                     <span>修改密码</span>
                 </Menu.Item>
                 <Menu.Item key='delete'>
-                    <span>删除</span>
+                    {/* <span onClick={() => { clickDel(record) }}>删除</span> */}
+                    <Popconfirm
+                        title="确定删除该记录吗？"
+                        description="Are you sure to delete this task?"
+                        onConfirm={() => { clickDel(record) }}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <a href="#">删除</a>
+                    </Popconfirm>
                 </Menu.Item>
                 <Menu.Item key='freeze'>
                     <span>冻结</span>
@@ -229,9 +271,51 @@ function userManage(props) {
         setRecord(record);
     };
 
+    // 修改用户
+    const amendUser = (id, params) => {
+        api.patchUserBasics(id, params).then((res) => {
+            message.success('修改成功')
+            setOpen(false)
+            initData()
+        }).catch((res) => {
+            message.error('修改失败');
+            setOpen(false);
+        });
+    }
+
+    // 添加用户
+    const addUser = (params) => {
+        api.postUserBasic(params).then((res) => {
+            message.success('添加成功');
+            setOpen(false)
+            userBasicsOrg(id);
+        }).catch((res) => {
+            message.error('新增失败');
+            setOpen(false);
+        });
+    }
+
     // 点击删除
-    const del = (record) => {
-        console.log('删除', record);
+    const del = (key) => {
+        console.log('删除', key,);
+        // if (record.key === 'delete') {
+        //     api.delUserBasics().then((res) => {
+        //         message.success('删除成功');
+        //         initData();
+        //     }).catch((res) => {
+        //         message.error('删除失败');
+        //     });
+        // }
+    };
+
+    const clickDel = (record) => {
+        console.log(record);
+        api.delUserBasics(record.id).then((res) => {
+            message.success('删除成功');
+            initData();
+        }).catch((res) => {
+            message.error('删除失败');
+        });
     }
 
     // 表格多选框
@@ -253,8 +337,18 @@ function userManage(props) {
         setModalTitle('新增');
     };
 
+    // 点击部门获取用户的接口
+    const userBasicsOrg = (id) => {
+        api.getUserBasicsOrg(id).then((res) => {
+            setData(res)
+        });
+    }
+
+    // 点击部门的回调
     const onSelect = (selectedKeys, info) => {
-        console.log('selected', selectedKeys, info);
+        let id = info.node.id
+        setOrgId(id)
+        userBasicsOrg(id)
     };
 
     return (
@@ -271,7 +365,6 @@ function userManage(props) {
                                     : false
                             }
                             showIcon={showIcon}
-                            // defaultExpandedKeys={['0-0-0']}
                             onSelect={onSelect}
                             treeData={treeData}
                         />
@@ -328,7 +421,7 @@ function userManage(props) {
                     <div style={{ marginBottom: 20 }}>
                         <Space>
                             <Button type="primary" onClick={showModal} icon={<PlusOutlined />}>新增</Button>
-                            <BaseModal vis={open} fn={showModal} title={modalTitle} record={record}></BaseModal>
+                            <BaseModal vis={open} onAmend={amendUser} onAdd={addUser} fn={showModal} title={modalTitle} record={record} orgId={orgId}></BaseModal>
                             <Button icon={<DeleteOutlined />}>删除</Button>
                             <Button icon={<DownloadOutlined />}>导出</Button>
                             <Button icon={<LockOutlined />}>冻结</Button>
